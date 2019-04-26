@@ -9,7 +9,7 @@ See also a version that features recursive checking:
 http://www.w3.org/mid/1ce6d0230912160806x1ee6f25dgafc73865140b239e@mail.gmail.com
 
 Share and Enjoy. Open Source license:
-Copyright (c) 2001-2005 W3C (MIT, ERCIM, Keio)
+Copyright (c) 2001-20019 W3C (MIT, ERCIM, Keio)
 http://www.w3.org/Consortium/Legal/2002/copyright-software-20021231
 $Id$
  branched from v 1.46
@@ -37,11 +37,10 @@ def format_option(a,b,c):
 Page1 ="""Content-Type:text/html; charset=utf-8
 
 
-<?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en-US" lang="en-US">
+<!DOCTYPE html>
+<html lang="en">
 <head>
+  <meta charset="utf-8">
   %s
   <title>W3C Spell Checker %s</title>
   <link rel="stylesheet" href="http://www.w3.org/Stylesheets/base"/>

@@ -161,8 +161,8 @@ if __name__ == '__main__':
                 clean_print("<p><span class='no'>Unable to read</span> <a href='%s'>%s</a> (%s). Sorry, check the URI.</p>", uri, uri, url_opener.error)
                 print Page2
                 sys.exit()
-
         headers = fp.info()
+        inp = fp.read()
         lynx_cmd = ['/usr/bin/lynx', '-cfg=/usr/local/lib/lynx.cfg', '-nolist',
                     '-dump', '-stdin']
         if headers.has_key('Content-Type'):
@@ -171,10 +171,11 @@ if __name__ == '__main__':
                         lynx_cmd.append('-assume_charset=%s' %
                                         contentType[1]['charset'])
 
-        lynx_proc = Popen(lynx_cmd, stdin=fp, stdout=PIPE)
+        lynx_proc = Popen(lynx_cmd, stdin=PIPE, stdout=PIPE)
         aspell_proc = Popen(['/usr/bin/aspell', '-a', '--encoding=utf-8',
                              '--sug-mode=fast', '--lang', lang],
                             stdin=lynx_proc.stdout, stdout=PIPE)
+        lynx_proc.communicate(input=inp)
         lynx_proc.wait()
         lynx_proc.stdout.close()
         print "<h2>Errors found in the page</h2>"

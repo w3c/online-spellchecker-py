@@ -106,6 +106,7 @@ def format(fp,suggest):
 	if not words:
 		print "<p><span class='yes'>No errors</span> found.</p>"
                 return
+        print "<ol>"
         for error in sorted(words):
                 clean_print("<li>\"<span class='no'>%s</span>\"", error)
                 if words[error] and suggest:
@@ -114,6 +115,7 @@ def format(fp,suggest):
                                 clean_print("<li>%s</li>", option)
                         print "</ul>"				
                 print "</li>"
+        print "</ol>"
 
 def getLangSetup(fields):
         lang = fields.getfirst('lang')

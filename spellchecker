@@ -26,6 +26,11 @@ from cleanhtml import *
 from subprocess import Popen, PIPE
 
 languages = {"en_US":"English","fr":"French"}
+# allow to extend aspell with user-defined dictionaries
+# give the path to the extra dicts as defined by
+# the --extra-dicts parameter
+aspell_extra_dicts = ""
+
 def format_option(a,b,c):
 	if a:
 		selected=""
@@ -47,7 +52,7 @@ Page1 ="""Content-Type:text/html; charset=utf-8
   <link rel="stylesheet" href="http://www.w3.org/2001/11/results"/>
   <style type="text/css">
    ul.suggestions { height:5em; overflow:auto; width:10em;}
-   
+
   </style>
 </head>
 
@@ -113,7 +118,7 @@ def format(fp,suggest):
 			print("; suggestions:<ul class='suggestions'>")
 			for option in words[error]:
 				clean_print("<li>%s</li>", option)
-			print("</ul>")				
+			print("</ul>")
 		print("</li>")
 	print("</ol>")
 
@@ -174,9 +179,16 @@ if __name__ == '__main__':
 					contentType[1]['charset'])
 
 	lynx_proc = Popen(lynx_cmd, stdin=PIPE, stdout=PIPE)
-	aspell_proc = Popen(['/usr/bin/aspell', '-a', '--encoding=utf-8',
-			     '--sug-mode=fast', '--lang', lang],
+
+	aspell_command = ['/usr/bin/aspell', '-a', '--encoding=utf-8',
+                          '--sug-mode=fast', '--lang', lang]
+	if aspell_extra_dicts:
+		aspell_command.extend(['---extra-dicts',
+				       aspell_extra_dicts])
+
+	aspell_proc = Popen(aspell_command,
 			    stdin=lynx_proc.stdout, stdout=PIPE)
+
 	lynx_proc.communicate(input=inp)
 	lynx_proc.wait()
 	lynx_proc.stdout.close()

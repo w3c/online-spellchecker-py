@@ -26,10 +26,6 @@ from cleanhtml import *
 from subprocess import Popen, PIPE
 
 languages = {"en_US":"English","fr":"French"}
-# allow to extend aspell with user-defined dictionaries
-# give the path to the extra dicts as defined by
-# the --extra-dicts parameter
-aspell_extra_dicts = ""
 
 def format_option(a,b,c):
 	if a:
@@ -182,9 +178,6 @@ if __name__ == '__main__':
 
 	aspell_command = ['/usr/bin/aspell', '-a', '--encoding=utf-8',
                           '--sug-mode=fast', '--lang', lang]
-	if aspell_extra_dicts:
-		aspell_command.extend(['---extra-dicts',
-				       aspell_extra_dicts])
 
 	aspell_proc = Popen(aspell_command,
 			    stdin=lynx_proc.stdout, stdout=PIPE)

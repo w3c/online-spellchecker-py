@@ -15,7 +15,6 @@ $Id$
  branched from v 1.46
 """
 
-import cgi
 import checkremote
 import http_auth
 import os
@@ -24,6 +23,7 @@ import urllib.parse
 
 from cleanhtml import *
 from subprocess import Popen, PIPE
+from email.message import EmailMessage
 
 languages = {"en_US":"English","fr":"French"}
 
@@ -118,8 +118,15 @@ def format(fp,suggest):
 		print("</li>")
 	print("</ol>")
 
+def _getfirst(fields, key, default=None):
+	""" Return the first value received."""
+	if key in fields:
+		return fields[key]
+	else:
+		return default
+
 def getLangSetup(fields):
-	lang = fields.getfirst('lang')
+	lang = _getfirst(fields, 'lang')
 	if lang not in languages:
 		lang = 'en_US'
 	lang_opts = ''.join(format_option(code, languages[code], lang)
@@ -127,18 +134,18 @@ def getLangSetup(fields):
 	return lang, lang_opts
 
 def getSuggestSetup(fields):
-	if fields.getfirst('suggest') == 'on':
+	if _getfirst(fields, 'suggest') == 'on':
 		return True, " checked='checked'"
 	return False, ""
 
 def getURI(fields):
-	uri = fields.getfirst('uri')
+	uri = _getfirst(fields, 'uri')
 	if (not uri) and ('referrer' in fields):
 		uri = os.environ.get('HTTP_REFERER')
 	return uri
 
 if __name__ == '__main__':
-	fields = cgi.FieldStorage()
+	fields = dict(urllib.parse.parse_qsl(os.getenv('QUERY_STRING', [])))
 	lang, languages_options = getLangSetup(fields)
 	suggest, suggest_txt = getSuggestSetup(fields)
 	uri = getURI(fields)
@@ -169,10 +176,11 @@ if __name__ == '__main__':
 	lynx_cmd = ['/usr/bin/lynx', '-cfg=/usr/local/lib/lynx.cfg', '-nolist',
 		    '-dump', '-stdin']
 	if 'Content-Type' in headers:
-		contentType = cgi.parse_header(headers['Content-Type'])
-		if 'charset' in contentType[1]:
+		msg = EmailMessage()
+		msg['content-type'] = headers["Content-Type"]
+		if 'charset' in msg['content-type'].params:
 			lynx_cmd.append('-assume_charset=%s' %
-					contentType[1]['charset'])
+					msg['content-type'].params['charset'].lower())
 
 	lynx_proc = Popen(lynx_cmd, stdin=PIPE, stdout=PIPE)
 

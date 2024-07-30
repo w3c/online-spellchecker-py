@@ -144,6 +144,22 @@ def getURI(fields):
 		uri = os.environ.get('HTTP_REFERER')
 	return uri
 
+def escapeURLQueryString(url=None):
+	if url is None:
+		return None
+
+	url_split = urllib.parse.urlsplit(url)
+
+	if url_split.query:
+		fields = dict(urllib.parse.parse_qsl(url_split.query))
+		escaped_qs = urllib.parse.urlencode(fields)
+		url_split = url_split._replace(query=escaped_qs)
+		rv = urllib.parse.urlunsplit(url_split)
+	else:
+		rv = url
+
+	return rv
+
 if __name__ == '__main__':
 	fields = dict(urllib.parse.parse_qsl(os.getenv('QUERY_STRING', [])))
 	lang, languages_options = getLangSetup(fields)
@@ -163,6 +179,7 @@ if __name__ == '__main__':
 
 	url_opener = http_auth.ProxyAuthURLopener()
 	try:
+		uri = escapeUrlQueryString(uri)
 		fp = url_opener.open(uri)
 	except IOError as e:
 		url_opener.error = "I/O error: %s %s" % (e.errno,e.strerror)

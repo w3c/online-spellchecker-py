@@ -202,7 +202,7 @@ if __name__ == '__main__':
 	lynx_proc = Popen(lynx_cmd, stdin=PIPE, stdout=PIPE)
 
 	aspell_command = ['/usr/bin/aspell', '-a', '--encoding=utf-8',
-                          '--sug-mode=fast', '--lang', lang]
+                          '--sug-mode=fast', '--save-repl=false', '--lang', lang]
 
 	aspell_proc = Popen(aspell_command,
 			    stdin=lynx_proc.stdout, stdout=PIPE)

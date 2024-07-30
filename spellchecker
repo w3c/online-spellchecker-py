@@ -179,7 +179,7 @@ if __name__ == '__main__':
 
 	url_opener = http_auth.ProxyAuthURLopener()
 	try:
-		uri = escapeUrlQueryString(uri)
+		uri = escapeURLQueryString(uri)
 		fp = url_opener.open(uri)
 	except IOError as e:
 		url_opener.error = "I/O error: %s %s" % (e.errno,e.strerror)

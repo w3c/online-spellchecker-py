@@ -15,7 +15,6 @@ $Id$
  branched from v 1.46
 """
 
-import checkremote
 import http_auth
 import os
 import sys
@@ -93,8 +92,9 @@ Last Modified: $Date$
 
 def format(fp,suggest):
     words = {}
-    for line in fp:
-        line = line.decode("utf-8").rstrip('\n')
+    # convert fp from bytes to string and split into lines
+    for line in fp.decode("utf-8").split('\n'):
+        line = line.rstrip('\n')
         if line and line != "*" and line[0] != "@":
             parts = line.split(': ')
             fields = parts[0].split()
@@ -188,8 +188,10 @@ if __name__ == '__main__':
         clean_print("<p><span class='no'>Unable to read</span> <a href='%s'>%s</a> (%s). Sorry, check the URI.</p>", uri, uri, url_opener.error)
         print(Page2)
         sys.exit()
+
     headers = fp.info()
     inp = fp.read()
+
     lynx_cmd = ['/usr/bin/lynx', '-cfg=/usr/local/lib/lynx.cfg', '-nolist',
                 '-dump', '-stdin']
     if 'Content-Type' in headers:
@@ -207,10 +209,12 @@ if __name__ == '__main__':
     aspell_proc = Popen(aspell_command,
                         stdin=lynx_proc.stdout, stdout=PIPE)
 
+    lynx_proc.stdout.close()
+
     lynx_proc.communicate(input=inp)
     lynx_proc.wait()
-    lynx_proc.stdout.close()
+
     print("<h2>Errors found in the page</h2>")
-    format(aspell_proc.stdout, suggest)
+    format(aspell_proc.stdout.read(), suggest)
     aspell_proc.stdout.close()
     print(Page2)

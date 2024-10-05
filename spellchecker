@@ -28,12 +28,12 @@ from email.message import EmailMessage
 languages = {"en_US":"English","fr":"French"}
 
 def format_option(a,b,c):
-	if a:
-		selected=""
-		if a==c:
-			selected=" selected='selected'"
-		return clean_format("<option value='%s'%s>%s</option>",
-				    a, selected, b)
+    if a:
+        selected=""
+        if a==c:
+            selected=" selected='selected'"
+        return clean_format("<option value='%s'%s>%s</option>",
+                            a, selected, b)
 
 Page1 ="""Content-Type:text/html; charset=utf-8
 
@@ -92,125 +92,125 @@ Last Modified: $Date$
 """
 
 def format(fp,suggest):
-	words = {}
-	for line in fp:
-		line = line.decode("utf-8").rstrip('\n')
-		if line and line != "*" and line[0] != "@":
-			parts = line.split(': ')
-			fields = parts[0].split()
-			if fields[1] in words:
-				continue
-			elif fields[0]=="&":
-				words[fields[1]] = parts[1].split(", ")
-			elif fields[0]=="#":
-				words[fields[1]] = []
-	if not words:
-		print("<p><span class='yes'>No errors</span> found.</p>")
-		return
-	print("<ol>")
-	for error in sorted(words):
-		clean_print("<li>\"<span class='no'>%s</span>\"", error)
-		if words[error] and suggest:
-			print("; suggestions:<ul class='suggestions'>")
-			for option in words[error]:
-				clean_print("<li>%s</li>", option)
-			print("</ul>")
-		print("</li>")
-	print("</ol>")
+    words = {}
+    for line in fp:
+        line = line.decode("utf-8").rstrip('\n')
+        if line and line != "*" and line[0] != "@":
+            parts = line.split(': ')
+            fields = parts[0].split()
+            if fields[1] in words:
+                continue
+            elif fields[0]=="&":
+                words[fields[1]] = parts[1].split(", ")
+            elif fields[0]=="#":
+                words[fields[1]] = []
+    if not words:
+        print("<p><span class='yes'>No errors</span> found.</p>")
+        return
+    print("<ol>")
+    for error in sorted(words):
+        clean_print("<li>\"<span class='no'>%s</span>\"", error)
+        if words[error] and suggest:
+            print("; suggestions:<ul class='suggestions'>")
+            for option in words[error]:
+                clean_print("<li>%s</li>", option)
+            print("</ul>")
+        print("</li>")
+    print("</ol>")
 
 def _getfirst(fields, key, default=None):
-	""" Return the first value received."""
-	if key in fields:
-		return fields[key]
-	else:
-		return default
+    """ Return the first value received."""
+    if key in fields:
+        return fields[key]
+    else:
+        return default
 
 def getLangSetup(fields):
-	lang = _getfirst(fields, 'lang')
-	if lang not in languages:
-		lang = 'en_US'
-	lang_opts = ''.join(format_option(code, languages[code], lang)
-			    for code in languages)
-	return lang, lang_opts
+    lang = _getfirst(fields, 'lang')
+    if lang not in languages:
+        lang = 'en_US'
+    lang_opts = ''.join(format_option(code, languages[code], lang)
+                        for code in languages)
+    return lang, lang_opts
 
 def getSuggestSetup(fields):
-	if _getfirst(fields, 'suggest') == 'on':
-		return True, " checked='checked'"
-	return False, ""
+    if _getfirst(fields, 'suggest') == 'on':
+        return True, " checked='checked'"
+    return False, ""
 
 def getURI(fields):
-	uri = _getfirst(fields, 'uri')
-	if (not uri) and ('referrer' in fields):
-		uri = os.environ.get('HTTP_REFERER')
-	return uri
+    uri = _getfirst(fields, 'uri')
+    if (not uri) and ('referrer' in fields):
+        uri = os.environ.get('HTTP_REFERER')
+    return uri
 
 def escapeURLQueryString(url=None):
-	if url is None:
-		return None
+    if url is None:
+        return None
 
-	url_split = urllib.parse.urlsplit(url)
+    url_split = urllib.parse.urlsplit(url)
 
-	if url_split.query:
-		fields = dict(urllib.parse.parse_qsl(url_split.query))
-		escaped_qs = urllib.parse.urlencode(fields)
-		url_split = url_split._replace(query=escaped_qs)
-		rv = urllib.parse.urlunsplit(url_split)
-	else:
-		rv = url
+    if url_split.query:
+        fields = dict(urllib.parse.parse_qsl(url_split.query))
+        escaped_qs = urllib.parse.urlencode(fields)
+        url_split = url_split._replace(query=escaped_qs)
+        rv = urllib.parse.urlunsplit(url_split)
+    else:
+        rv = url
 
-	return rv
+    return rv
 
 if __name__ == '__main__':
-	fields = dict(urllib.parse.parse_qsl(os.getenv('QUERY_STRING', [])))
-	lang, languages_options = getLangSetup(fields)
-	suggest, suggest_txt = getSuggestSetup(fields)
-	uri = getURI(fields)
-	if not uri:
-		print(Page1 % ('', '', '', clean_str(uri), languages_options,
-			       suggest_txt))
-		print(Page2)
-		sys.exit()
+    fields = dict(urllib.parse.parse_qsl(os.getenv('QUERY_STRING', [])))
+    lang, languages_options = getLangSetup(fields)
+    suggest, suggest_txt = getSuggestSetup(fields)
+    uri = getURI(fields)
+    if not uri:
+        print(Page1 % ('', '', '', clean_str(uri), languages_options,
+                       suggest_txt))
+        print(Page2)
+        sys.exit()
 
-	uri_text1 = clean_format("for %s", uri)
-	uri_text = clean_format(" for <a href=\"%s\">%s</a>", uri, uri)
-	print(Page1 % ('<meta name="ROBOTS" content="NOINDEX,NOFOLLOW"/>',
-		       uri_text1, uri_text, clean_str(uri), languages_options,
-		       suggest_txt))
+    uri_text1 = clean_format("for %s", uri)
+    uri_text = clean_format(" for <a href=\"%s\">%s</a>", uri, uri)
+    print(Page1 % ('<meta name="ROBOTS" content="NOINDEX,NOFOLLOW"/>',
+                   uri_text1, uri_text, clean_str(uri), languages_options,
+                   suggest_txt))
 
-	url_opener = http_auth.ProxyAuthURLopener()
-	try:
-		uri = escapeURLQueryString(uri)
-		fp = url_opener.open(uri)
-	except IOError as e:
-		url_opener.error = "I/O error: %s %s" % (e.errno,e.strerror)
-		fp = None
-	if fp is None:
-		clean_print("<p><span class='no'>Unable to read</span> <a href='%s'>%s</a> (%s). Sorry, check the URI.</p>", uri, uri, url_opener.error)
-		print(Page2)
-		sys.exit()
-	headers = fp.info()
-	inp = fp.read()
-	lynx_cmd = ['/usr/bin/lynx', '-cfg=/usr/local/lib/lynx.cfg', '-nolist',
-		    '-dump', '-stdin']
-	if 'Content-Type' in headers:
-		msg = EmailMessage()
-		msg['content-type'] = headers["Content-Type"]
-		if 'charset' in msg['content-type'].params:
-			lynx_cmd.append('-assume_charset=%s' %
-					msg['content-type'].params['charset'].lower())
+    url_opener = http_auth.ProxyAuthURLopener()
+    try:
+        uri = escapeURLQueryString(uri)
+        fp = url_opener.open(uri)
+    except IOError as e:
+        url_opener.error = "I/O error: %s %s" % (e.errno,e.strerror)
+        fp = None
+    if fp is None:
+        clean_print("<p><span class='no'>Unable to read</span> <a href='%s'>%s</a> (%s). Sorry, check the URI.</p>", uri, uri, url_opener.error)
+        print(Page2)
+        sys.exit()
+    headers = fp.info()
+    inp = fp.read()
+    lynx_cmd = ['/usr/bin/lynx', '-cfg=/usr/local/lib/lynx.cfg', '-nolist',
+                '-dump', '-stdin']
+    if 'Content-Type' in headers:
+        msg = EmailMessage()
+        msg['content-type'] = headers["Content-Type"]
+        if 'charset' in msg['content-type'].params:
+            lynx_cmd.append('-assume_charset=%s' %
+                            msg['content-type'].params['charset'].lower())
 
-	lynx_proc = Popen(lynx_cmd, stdin=PIPE, stdout=PIPE)
+    lynx_proc = Popen(lynx_cmd, stdin=PIPE, stdout=PIPE)
 
-	aspell_command = ['/usr/bin/aspell', '-a', '--encoding=utf-8',
-                          '--sug-mode=fast', '--save-repl=false', '--lang', lang]
+    aspell_command = ['/usr/bin/aspell', '-a', '--encoding=utf-8',
+                      '--sug-mode=fast', '--save-repl=false', '--lang', lang]
 
-	aspell_proc = Popen(aspell_command,
-			    stdin=lynx_proc.stdout, stdout=PIPE)
+    aspell_proc = Popen(aspell_command,
+                        stdin=lynx_proc.stdout, stdout=PIPE)
 
-	lynx_proc.communicate(input=inp)
-	lynx_proc.wait()
-	lynx_proc.stdout.close()
-	print("<h2>Errors found in the page</h2>")
-	format(aspell_proc.stdout, suggest)
-	aspell_proc.stdout.close()
-	print(Page2)
+    lynx_proc.communicate(input=inp)
+    lynx_proc.wait()
+    lynx_proc.stdout.close()
+    print("<h2>Errors found in the page</h2>")
+    format(aspell_proc.stdout, suggest)
+    aspell_proc.stdout.close()
+    print(Page2)

@@ -186,7 +186,7 @@ if __name__ == '__main__':
         url_opener.error = f"HTTP Error: {error.code} {error.reason}"
         fp = None
     except urllib.error.URLError as error:
-        opener.error = f"URL error: {str(error.reason)}"
+        url_opener.error = f"URL error: {str(error.reason)}"
         fp = None
     except OSError as e:
         url_opener.error = f"I/O error: {error.errno} {error.strerr}"

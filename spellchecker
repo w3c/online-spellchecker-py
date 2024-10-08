@@ -192,7 +192,7 @@ if __name__ == '__main__':
         url_opener.error = f"URL error: {str(error)}"
         fp = None
     except OSError as error:
-        url_opener.error = f"I/O error: {error.errno} {error.strerr}"
+        url_opener.error = f"I/O error: {error.errno} {error.strerror}"
         fp = None
 
     if fp is None:

@@ -188,9 +188,13 @@ if __name__ == '__main__':
     except urllib.error.URLError as error:
         url_opener.error = f"URL error: {str(error.reason)}"
         fp = None
-    except OSError as e:
+    except ValueError as error:
+        url_opener.error = f"URL error: {str(error)}"
+        fp = None
+    except OSError as error:
         url_opener.error = f"I/O error: {error.errno} {error.strerr}"
         fp = None
+
     if fp is None:
         clean_print("<p><span class='no'>Unable to read</span> <a href='%s'>%s</a> (%s). Sorry, check the URI.</p>", uri, uri, url_opener.error)
         print(Page2)

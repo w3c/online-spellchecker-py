@@ -19,6 +19,7 @@ import http_auth
 import os
 import sys
 import urllib.parse
+import urllib.error
 
 from cleanhtml import *
 from subprocess import Popen, PIPE
@@ -181,8 +182,11 @@ if __name__ == '__main__':
     try:
         uri = escapeURLQueryString(uri)
         fp = url_opener.open(uri)
-    except IOError as e:
-        url_opener.error = "I/O error: %s %s" % (e.errno,e.strerror)
+    except urllib.error.HTTPError as error:
+        url_opener.error = f"HTTP Error: {error.code} {error.reason}"
+        fp = None
+    except OSError as e:
+        url_opener.error = f"I/O error: {error.errno} {error.strerr}"
         fp = None
     if fp is None:
         clean_print("<p><span class='no'>Unable to read</span> <a href='%s'>%s</a> (%s). Sorry, check the URI.</p>", uri, uri, url_opener.error)

@@ -220,12 +220,12 @@ if __name__ == '__main__':
     aspell_proc = Popen(aspell_command,
                         stdin=lynx_proc.stdout, stdout=PIPE)
 
-    lynx_proc.stdout.close()
-
-    lynx_proc.communicate(input=inp)
-    lynx_proc.wait()
+    lynx_proc.stdin.write(inp)
+    lynx_proc.stdin.flush()
+    lynx_proc.stdin.close()
 
     print("<h2>Errors found in the page</h2>")
     format(aspell_proc.stdout.read(), suggest)
     aspell_proc.stdout.close()
+    aspell_proc.wait()
     print(Page2)

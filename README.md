@@ -53,7 +53,7 @@ HTTP-protected resources; if not, you could remove the module for good
 by replacing the following 2 lines:
 
 import http_auth
-url_opener = http_auth.ProxyAuthURLopener()
+url_opener = http_auth.ProtectedURLopener()
 
 by
 

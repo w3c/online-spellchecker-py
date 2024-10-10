@@ -23,7 +23,6 @@ import urllib.error
 
 from cleanhtml import *
 from subprocess import Popen, PIPE
-from email.message import EmailMessage
 
 languages = {"en_US":"English","fr":"French"}
 
@@ -205,12 +204,11 @@ if __name__ == '__main__':
 
     lynx_cmd = ['/usr/bin/lynx', '-cfg=/usr/local/lib/lynx.cfg', '-nolist',
                 '-dump', '-stdin']
+
     if 'Content-Type' in headers:
-        msg = EmailMessage()
-        msg['content-type'] = headers["Content-Type"]
-        if 'charset' in msg['content-type'].params:
-            lynx_cmd.append('-assume_charset=%s' %
-                            msg['content-type'].params['charset'].lower())
+        charset = headers.get_content_charset()
+        if charset:
+            lynx_cmd.append('-assume_charset={}'.format(charset.lower()))
 
     lynx_proc = Popen(lynx_cmd, stdin=PIPE, stdout=PIPE)
 

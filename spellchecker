@@ -22,7 +22,7 @@ import urllib.parse
 import urllib.error
 
 from cleanhtml import *
-from subprocess import Popen, PIPE
+from subprocess import Popen, PIPE, DEVNULL
 
 languages = {"en_US":"English","fr":"French"}
 
@@ -215,8 +215,13 @@ if __name__ == '__main__':
     aspell_command = ['/usr/bin/aspell', '-a', '--encoding=utf-8',
                       '--sug-mode=fast', '--save-repl=false', '--lang', lang]
 
+    # aspell outputs invalid word formats to stderr, such as:
+    # Error: The word "(datadef|datastruct|extension)" is invalid.
+    # The character '(' (U+28) may not appear at the beginning of a word.
+    # as long as spellchecker doesn't display them we'll redirect
+    # them to DEVNULL
     aspell_proc = Popen(aspell_command,
-                        stdin=lynx_proc.stdout, stdout=PIPE)
+                        stdin=lynx_proc.stdout, stdout=PIPE, stderr=DEVNULL)
 
     lynx_proc.stdin.write(inp)
     lynx_proc.stdin.flush()

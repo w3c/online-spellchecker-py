@@ -195,7 +195,7 @@ if __name__ == '__main__':
         fp = None
 
     if fp is None:
-        clean_print("<p><span class='no'>An error (%s}) occurent trying to read <a href='%s'>%s</a>.</span></p>", url_opener.error, uri, uri)
+        clean_print("<p><span class='no'>An error (%s}) occured trying to read <a href='%s'>%s</a>.</span></p>", url_opener.error, uri, uri)
         print(Page2)
         sys.exit()
 

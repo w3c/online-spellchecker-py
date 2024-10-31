@@ -173,9 +173,9 @@ if __name__ == '__main__':
 
     uri_text1 = clean_format("for %s", uri)
     uri_text = clean_format(" for <a href=\"%s\">%s</a>", uri, uri)
-    print(Page1 % ('<meta name="ROBOTS" content="NOINDEX,NOFOLLOW"/>',
-                   uri_text1, uri_text, clean_str(uri), languages_options,
-                   suggest_txt))
+    page1_formatted = Page1 % ('<meta name="ROBOTS" content="NOINDEX,NOFOLLOW"/>',
+                               uri_text1, uri_text, clean_str(uri), languages_options,
+                               suggest_txt)
 
     url_opener = http_auth.ProtectedURLopener()
     try:
@@ -195,9 +195,14 @@ if __name__ == '__main__':
         fp = None
 
     if fp is None:
+        print("Status: 403")
+        print(page1_formatted)
         clean_print("<p><span class='no'>An error (%s}) occured trying to read <a href='%s'>%s</a>.</span></p>", url_opener.error, uri, uri)
         print(Page2)
         sys.exit()
+
+    print(page1_formatted)
+    page1_formatted = None
 
     headers = fp.info()
     inp = fp.read()

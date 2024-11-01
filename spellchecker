@@ -15,14 +15,15 @@ $Id$
  branched from v 1.46
 """
 
-import http_auth
 import os
 import sys
 import urllib.parse
 import urllib.error
 
-from cleanhtml import *
 from subprocess import Popen, PIPE, DEVNULL
+
+import http_auth
+from cleanhtml import clean_format, clean_print, clean_str
 
 languages = {"en_US":"English","fr":"French"}
 
@@ -33,6 +34,7 @@ def format_option(a,b,c):
             selected=" selected='selected'"
         return clean_format("<option value='%s'%s>%s</option>",
                             a, selected, b)
+    return ()
 
 Page1 ="""Content-Type:text/html; charset=utf-8
 
@@ -90,7 +92,7 @@ Last Modified: $Date$
 </html>
 """
 
-def format(fp,suggest):
+def aspell_output_format(fp,suggest):
     words = {}
     # convert fp from bytes to string and split into lines
     for line in fp.decode("utf-8").split('\n'):
@@ -150,10 +152,22 @@ def escapeURLQueryString(url=None):
 
     url_split = urllib.parse.urlsplit(url)
 
+    unsplit = False
+
+    url_split = urllib.parse.urlsplit(url)
+
     if url_split.query:
         fields = dict(urllib.parse.parse_qsl(url_split.query))
         escaped_qs = urllib.parse.urlencode(fields)
         url_split = url_split._replace(query=escaped_qs)
+        unsplit = True
+
+    if url_split.path and not url_split.path.isascii():
+        escaped_path = urllib.parse.quote(url_split.path)
+        url_split = url_split._replace(path=escaped_path)
+        unsplit = True
+
+    if unsplit:
         rv = urllib.parse.urlunsplit(url_split)
     else:
         rv = url
@@ -173,9 +187,9 @@ if __name__ == '__main__':
 
     uri_text1 = clean_format("for %s", uri)
     uri_text = clean_format(" for <a href=\"%s\">%s</a>", uri, uri)
-    print(Page1 % ('<meta name="ROBOTS" content="NOINDEX,NOFOLLOW"/>',
-                   uri_text1, uri_text, clean_str(uri), languages_options,
-                   suggest_txt))
+    page1_formatted = Page1 % ('<meta name="ROBOTS" content="NOINDEX,NOFOLLOW"/>',
+                               uri_text1, uri_text, clean_str(uri), languages_options,
+                               suggest_txt)
 
     url_opener = http_auth.ProtectedURLopener()
     try:
@@ -195,9 +209,14 @@ if __name__ == '__main__':
         fp = None
 
     if fp is None:
-        clean_print("<p><span class='no'>Unable to read</span> <a href='%s'>%s</a> (%s). Sorry, check the URI.</p>", uri, uri, url_opener.error)
+        print("Status: 403")
+        print(page1_formatted)
+        clean_print("<p><span class='no'>An error (%s}) occured trying to read <a href='%s'>%s</a>.</span></p>", url_opener.error, uri, uri)
         print(Page2)
         sys.exit()
+
+    print(page1_formatted)
+    page1_formatted = None
 
     headers = fp.info()
     inp = fp.read()
@@ -228,7 +247,7 @@ if __name__ == '__main__':
     lynx_proc.stdin.close()
 
     print("<h2>Errors found in the page</h2>")
-    format(aspell_proc.stdout.read(), suggest)
+    aspell_output_format(aspell_proc.stdout.read(), suggest)
     aspell_proc.stdout.close()
     aspell_proc.wait()
     print(Page2)
